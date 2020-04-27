@@ -9,12 +9,12 @@
  *
  * Originally written by Mike Hamburg
  */
-#include <openssl/crypto.h>
+#include "openssl/definitions.h"
 #include "word.h"
 #include "field.h"
 
 #include "point_448.h"
-#include "ed448.h"
+/* #include "ed448.h" */
 #include "curve448_local.h"
 
 #define COFACTOR 4
@@ -269,111 +269,6 @@ void curve448_precomputed_scalarmul(curve448_point_t out,
 
     OPENSSL_cleanse(ni, sizeof(ni));
     OPENSSL_cleanse(scalar1x, sizeof(scalar1x));
-}
-
-void curve448_point_mul_by_ratio_and_encode_like_eddsa(
-                                    uint8_t enc[EDDSA_448_PUBLIC_BYTES],
-                                    const curve448_point_t p)
-{
-    gf x, y, z, t;
-    curve448_point_t q;
-
-    /* The point is now on the twisted curve.  Move it to untwisted. */
-    curve448_point_copy(q, p);
-
-    {
-        /* 4-isogeny: 2xy/(y^+x^2), (y^2-x^2)/(2z^2-y^2+x^2) */
-        gf u;
-
-        gf_sqr(x, q->x);
-        gf_sqr(t, q->y);
-        gf_add(u, x, t);
-        gf_add(z, q->y, q->x);
-        gf_sqr(y, z);
-        gf_sub(y, y, u);
-        gf_sub(z, t, x);
-        gf_sqr(x, q->z);
-        gf_add(t, x, x);
-        gf_sub(t, t, z);
-        gf_mul(x, t, y);
-        gf_mul(y, z, u);
-        gf_mul(z, u, t);
-        OPENSSL_cleanse(u, sizeof(u));
-    }
-
-    /* Affinize */
-    gf_invert(z, z, 1);
-    gf_mul(t, x, z);
-    gf_mul(x, y, z);
-
-    /* Encode */
-    enc[EDDSA_448_PRIVATE_BYTES - 1] = 0;
-    gf_serialize(enc, x, 1);
-    enc[EDDSA_448_PRIVATE_BYTES - 1] |= 0x80 & gf_lobit(t);
-
-    OPENSSL_cleanse(x, sizeof(x));
-    OPENSSL_cleanse(y, sizeof(y));
-    OPENSSL_cleanse(z, sizeof(z));
-    OPENSSL_cleanse(t, sizeof(t));
-    curve448_point_destroy(q);
-}
-
-c448_error_t curve448_point_decode_like_eddsa_and_mul_by_ratio(
-                                curve448_point_t p,
-                                const uint8_t enc[EDDSA_448_PUBLIC_BYTES])
-{
-    uint8_t enc2[EDDSA_448_PUBLIC_BYTES];
-    mask_t low;
-    mask_t succ;
-
-    memcpy(enc2, enc, sizeof(enc2));
-
-    low = ~word_is_zero(enc2[EDDSA_448_PRIVATE_BYTES - 1] & 0x80);
-    enc2[EDDSA_448_PRIVATE_BYTES - 1] &= ~0x80;
-
-    succ = gf_deserialize(p->y, enc2, 1, 0);
-    succ &= word_is_zero(enc2[EDDSA_448_PRIVATE_BYTES - 1]);
-
-    gf_sqr(p->x, p->y);
-    gf_sub(p->z, ONE, p->x);    /* num = 1-y^2 */
-    gf_mulw(p->t, p->x, EDWARDS_D); /* dy^2 */
-    gf_sub(p->t, ONE, p->t);    /* denom = 1-dy^2 or 1-d + dy^2 */
-
-    gf_mul(p->x, p->z, p->t);
-    succ &= gf_isr(p->t, p->x); /* 1/sqrt(num * denom) */
-
-    gf_mul(p->x, p->t, p->z);   /* sqrt(num / denom) */
-    gf_cond_neg(p->x, gf_lobit(p->x) ^ low);
-    gf_copy(p->z, ONE);
-
-    {
-        gf a, b, c, d;
-
-        /* 4-isogeny 2xy/(y^2-ax^2), (y^2+ax^2)/(2-y^2-ax^2) */
-        gf_sqr(c, p->x);
-        gf_sqr(a, p->y);
-        gf_add(d, c, a);
-        gf_add(p->t, p->y, p->x);
-        gf_sqr(b, p->t);
-        gf_sub(b, b, d);
-        gf_sub(p->t, a, c);
-        gf_sqr(p->x, p->z);
-        gf_add(p->z, p->x, p->x);
-        gf_sub(a, p->z, d);
-        gf_mul(p->x, a, b);
-        gf_mul(p->z, p->t, a);
-        gf_mul(p->y, p->t, d);
-        gf_mul(p->t, b, d);
-        OPENSSL_cleanse(a, sizeof(a));
-        OPENSSL_cleanse(b, sizeof(b));
-        OPENSSL_cleanse(c, sizeof(c));
-        OPENSSL_cleanse(d, sizeof(d));
-    }
-
-    OPENSSL_cleanse(enc2, sizeof(enc2));
-    assert(curve448_point_valid(p) || ~succ);
-
-    return c448_succeed_if(mask_to_bool(succ));
 }
 
 c448_error_t x448_int(uint8_t out[X_PUBLIC_BYTES],

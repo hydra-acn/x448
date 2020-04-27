@@ -13,7 +13,7 @@
 #ifndef OSSL_CRYPTO_EC_CURVE448UTILS_H
 # define OSSL_CRYPTO_EC_CURVE448UTILS_H
 
-# include <openssl/e_os2.h>
+# include "openssl/definitions.h"
 
 /*
  * Internal word types. Somewhat tricky.  This could be decided separately per

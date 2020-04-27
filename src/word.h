@@ -16,7 +16,7 @@
 # include <string.h>
 # include <assert.h>
 # include <stdlib.h>
-# include <openssl/e_os2.h>
+# include "openssl/definitions.h"
 # include "arch_32/arch_intrinsics.h"
 # include "curve448utils.h"
 
