@@ -19,11 +19,13 @@ uint8_t* sk = generate_56_random_bytes();
 uint8_t* pk = allocate_56_bytes();
 x448_derive_public_key(pk, sk);
 
+send_pk_to_bob(pk);
+
 uint8_t* bob_pk = receive_56_bytes_from_bob();
 uint8_t* shared_secret = allocate_56_bytes();
 x448_int(shared_secret, bob_pk, sk);
 
-// cleanup your memory after use, overwrite keys with 0!
+// important: cleanup your memory after use (overwrite keys with 0, free/delete)!
 ```
 
 # Copyright notice:
