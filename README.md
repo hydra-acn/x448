@@ -10,8 +10,8 @@ make
 # Usage
 
 Only two functions are important for x448 ECDH, both defined and documented in `include/point_448.h`.
-* `c448_error_t x448_int(uint8_t out, const uint8_t* base, const uint8_t* scalar)`
-* `void x448_derive_public_key(uint8_t* out, const uint8_t* scalar`
+* `c448_error_t x448_int(uint8_t out, const uint8_t* base, const uint8_t* scalar);`
+* `void x448_derive_public_key(uint8_t* out, const uint8_t* scalar);`
 
 Workflow for Alice:
 ```
