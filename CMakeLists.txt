@@ -26,4 +26,7 @@ add_library(x448 STATIC
     src/word.h
 )
 
-install(TARGETS x448)
+install(
+    TARGETS x448
+    ARCHIVE DESTINATION lib
+)
