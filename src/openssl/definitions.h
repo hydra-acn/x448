@@ -36,7 +36,6 @@
 
 static ossl_inline void OPENSSL_cleanse(void* ptr, size_t len)
 {
-    /// TODO overwrite with zeros
     memset(ptr, 0, len);
 }
 
