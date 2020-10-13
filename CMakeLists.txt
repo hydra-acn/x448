@@ -19,12 +19,14 @@ add_library(x448 STATIC
     include/field.h
     include/word.h
     include/point_448.h
+    include/curve25519.h
     src/arch_32/f_impl.c
     src/curve448.c
     src/curve448_tables.c
     src/f_generic.c
     src/scalar.c
     src/curve448_local.h
+    src/curve25519.c
 )
 
 install(
