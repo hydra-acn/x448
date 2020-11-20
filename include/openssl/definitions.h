@@ -52,8 +52,8 @@ static ossl_inline int CRYPTO_memcmp(const void * in_a,
                                      size_t len)
 {
     size_t i;
-    const volatile unsigned char *a = in_a;
-    const volatile unsigned char *b = in_b;
+    const volatile unsigned char *a = (const unsigned char*) in_a;
+    const volatile unsigned char *b = (const unsigned char*) in_b;
     unsigned char x = 0;
 
     for (i = 0; i < len; i++)
