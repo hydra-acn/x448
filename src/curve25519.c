@@ -12,6 +12,12 @@
 #include "curve25519.h"
 #include "openssl/definitions.h"
 
+#if UINTPTR_MAX == 0xffffffff
+#define ARCH_32
+#endif
+
+#ifndef ARCH_32
+
 /*
  * Base 2^51 implementation. It's virtually no different from reference
  * base 2^25.5 implementation in respect to lax boundary conditions for
@@ -497,6 +503,8 @@ static void x25519_scalar_mult(uint8_t out[32], const uint8_t scalar[32],
 
     OPENSSL_cleanse(e, sizeof(e));
 }
+
+#endif // #ifndef ARCH_32
 
 /*
  * Reference base 2^25.5 implementation.
