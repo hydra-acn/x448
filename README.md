@@ -37,27 +37,30 @@ For x25519, the two relevant functions are defined and documented in `include/cu
 Workflow is analogous to `x448`, but with 32 byte keys.
 
 
-# Copyright notice:
+# Copyright notice
 
 Copyright (c) 1998-2020 The OpenSSL Project
 Copyright (c) 1995-1998 Eric A. Young, Tim J. Hudson
-
 All rights reserved.
 
-Originally written by Mike Hamburg
+x448 code originally written by Mike Hamburg.
 
 
 Modifications:
 
-Copyright (c) 2020 David Schatz (david.schatz@tu-ilmenau.de)
+Copyright (c) 2020 David Schatz
 
 Code copied from https://github.com/openssl/openssl
-Version 1.1.1f
+Version 3.0.0-alpha9
 
-Files are copied from the following directories, but moved, stripped and
-re-organized for standalone compilation
+Files are copied from the following directories and files, but moved, stripped
+and re-organized for standalone compilation. See further modification notices
+per file.
 
 * `crypto/ec/curve448`
 * `crypto/ec/curve25519.c`
-* `include/internal`
-* `crypto/cryptlib.c` (for `CRYPTO_memcmp`)
+* `crypto/cryptlib.c`
+* `include/crypto/ecx.h`
+* `include/internal/numbers.h`
+* `include/internal/constant_time.h`
+* `include/openssl/e_os2.h`
